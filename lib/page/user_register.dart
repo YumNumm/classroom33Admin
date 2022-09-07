@@ -1,11 +1,12 @@
-import 'package:admin/api/supabase_api.dart';
-import 'package:admin/provider/big_question_storage.dart';
-import 'package:admin/schema/question/question_category.dart';
-import 'package:admin/schema/user/user_register_model.dart';
+import 'package:admin/schema/user/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+
+import '../provider/big_question_storage.dart';
+import '../schema/question/question_category.dart';
 
 class UserRegisterPage extends HookConsumerWidget {
   const UserRegisterPage({Key? key}) : super(key: key);
@@ -129,13 +130,19 @@ class UserRegisterPage extends HookConsumerWidget {
           ? FloatingActionButton.extended(
               onPressed: () async {
                 try {
-                  final res = await SupabaseApi.addNewUser(
-                    UserRegisterModel(
-                      rideId: rideId.value!,
-                      bigQuestionGroupId: selectedQuizCase.value!,
-                      numberOfPeople: numberOfPeople.value,
-                    ),
-                  );
+                  final res = await Supabase.instance.client
+                      .from('users')
+                      .insert(<String, dynamic>{
+                    'big_question_group_id': selectedQuizCase.value,
+                    'ride_id': rideId.value,
+                  }).execute();
+
+                  if (res.error != null) {
+                    throw res.error!;
+                  }
+
+                  final user = UserModel.fromJson(
+                      (res.data as List)[0] as Map<String, dynamic>);
 
                   selectedCard.value = null;
                   selectedQuizCase.value = null;
@@ -147,8 +154,8 @@ class UserRegisterPage extends HookConsumerWidget {
                     builder: (context) => AlertDialog(
                       title: const Text("登録完了"),
                       content: Text(
-                        "ID:${res.id}\n"
-                        "ライドID: ${res.rideId}",
+                        "ID:${user.id}\n"
+                        "ライドID: ${user.rideId}",
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,

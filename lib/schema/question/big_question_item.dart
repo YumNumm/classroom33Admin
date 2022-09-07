@@ -6,14 +6,12 @@ import 'small_question_item.dart';
 class BigQuestionItem {
   BigQuestionItem({
     required this.id,
-    required this.title,
     required this.category,
     required this.questions,
   });
 
   factory BigQuestionItem.fromJson(Map<String, dynamic> j) => BigQuestionItem(
         id: int.parse(j['id'].toString()),
-        title: j['title']?.toString(),
         category: QuestionCategory.values
             .firstWhere((e) => e.name == j['category'].toString()),
         questions: List<SmallQuestionItem>.generate(
@@ -26,16 +24,12 @@ class BigQuestionItem {
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'id': id,
-        'title': title,
         'category': category.name,
         'questions': questions.map((e) => e.toJson()).toList(),
       };
 
   /// 大問ID
   final int id;
-
-  /// 大問タイトル
-  final String? title;
 
   /// 大問カテゴリ
   final QuestionCategory category;

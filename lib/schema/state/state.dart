@@ -1,29 +1,26 @@
-class DeviceStateItem {
-  DeviceStateItem({
+class StateItem {
+  StateItem({
     required this.position,
-    required this.state,
-    required this.userposition,
-    required this.isAccepted,
+    required this.bigQuestionState,
+    required this.bigQuestionGroupId,
     required this.userId,
   });
 
-  factory DeviceStateItem.fromJson(Map<String, dynamic> j) => DeviceStateItem(
+  factory StateItem.fromJson(Map<String, dynamic> j) => StateItem(
         position: DevicePosition.values.firstWhere(
           (element) => element.name == j['position'].toString(),
         ),
-        state: DeviceState.values.firstWhere(
-          (state) => state.name == j['state'].toString(),
+        bigQuestionState: BigQuestionState.values.firstWhere(
+          (element) => element.name == j['big_question_state'].toString(),
         ),
-        userposition: int.tryParse(j['user_position'].toString()),
-        isAccepted: j['accept_status']?.toString() == 'true',
+        bigQuestionGroupId: int.tryParse(j['big_question_group_id'].toString()),
         userId: int.tryParse(j['user_id'].toString()),
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'position': position.name,
-        'state': state.name,
-        'user_position': userposition,
-        'is_accepted': isAccepted,
+        'big_question_state': bigQuestionState.name,
+        'big_question_group_id': bigQuestionGroupId,
         'user_id': userId,
       };
 
@@ -31,46 +28,28 @@ class DeviceStateItem {
   final DevicePosition position;
 
   /// デバイスの状態
-  final DeviceState state;
+  final BigQuestionState bigQuestionState;
 
-  /// ユーザーID
-  final int? userposition;
-
-  /// Controllerによる承認
-  final bool? isAccepted;
+  /// 問題番号
+  final int? bigQuestionGroupId;
 
   /// ユーザID
   final int? userId;
 }
 
-enum DeviceState {
-  /// 待機中・終了
-  waiting,
+enum BigQuestionState {
+  /// 移動中(Controllerによる登録処理待ち)
+  waitingForController,
 
-  /// Controllerによる実行許可待ち
-  ///
-  starting,
+  /// 一斉開始待ち(Adminによる開始処理待ち)
+  waitingForAdmin,
 
   /// 実行開始
   running,
 }
 
-/// 続行するかどうか
-enum AcceptState {
-  /// Controllerによる続行許可
-  yes,
-
-  /// Controllerによる続行許可待ち
-  no,
-}
-
 enum DevicePosition {
-  register(0),
-  projector1(1),
-  projector2(2),
-  projector3(3),
-  result(0);
-
-  final int positionId;
-  const DevicePosition(this.positionId);
+  projector1,
+  projector2,
+  projector3;
 }

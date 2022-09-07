@@ -1,6 +1,6 @@
-import 'package:admin/page/main.dart';
-import 'package:admin/page/user_register.dart';
-import 'package:admin/private/key.dart';
+import 'page/main.dart';
+import 'page/user_register.dart';
+import 'private/key.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
         child: MaterialApp(
-      title: 'Flutter Demo',
+      title: 'C33 Admin',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
