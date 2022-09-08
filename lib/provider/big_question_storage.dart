@@ -598,7 +598,7 @@ final questions = <BigQuestionSet>[
             id: 115,
             questionStatement: r'焼き鳥のハツとはどこの部分?',
             choices: [r'心臓', r'肺', r'舌', r'脳'],
-            correctAnswerIndex: 4,
+            correctAnswerIndex: 1,
           ),
           SmallQuestionItem(
             id: 117,

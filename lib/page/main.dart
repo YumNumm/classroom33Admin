@@ -14,6 +14,7 @@ class MainPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: ref.watch(stateItemsStreamProvider).when<Widget>(
             data: (data) => Column(
               children: [
@@ -46,6 +47,20 @@ class MainPage extends HookConsumerWidget {
                                   ),
                                   const Divider(),
                                   Text(
+                                    e.bigQuestionState.name,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30,
+                                    ),
+                                  ),
+                                  Text(
+                                    "ユーザID:${e.userId} ライドID:${e.bigQuestionGroupId}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
                                     const JsonEncoder.withIndent('  ')
                                         .convert(e),
                                     style: const TextStyle(
@@ -60,51 +75,29 @@ class MainPage extends HookConsumerWidget {
                       ),
                     )
                     .toList(),
-                FloatingActionButton.extended(
-                  onPressed: () async {
-                    // PJ1~3を取得
-                    // PJ1 = null
-                    // PJ2 = PJ1
-                    // PJ3 = PJ2
-                    // TODO(YumNumm): RPC作成
-                    final res = await Future.wait(<Future<dynamic>>[
-                      Supabase.instance.client
-                          .from("state")
-                          .update(<String, dynamic>{
-                            'big_question_state':
-                                BigQuestionState.waitingForController.name,
-                            'big_question_group_id': null,
-                          })
-                          .eq('position', DevicePosition.projector1)
-                          .execute(),
-                      Supabase.instance.client
-                          .from("state")
-                          .update(<String, dynamic>{
-                            'big_question_state':
-                                BigQuestionState.waitingForController.name,
-                            'big_question_group_id': null,
-                          })
-                          .eq('position', DevicePosition.projector2)
-                          .execute(),
-                      Supabase.instance.client
-                          .from("state")
-                          .update(<String, dynamic>{
-                            'big_question_state':
-                                BigQuestionState.waitingForController.name,
-                            'big_question_group_id': null,
-                          })
-                          .eq('position', DevicePosition.projector3)
-                          .execute(),
-                    ]);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("更新しました\n$res"),
-                      ),
-                    );
-                  },
-                  label: const Text("次に進める"),
-                  icon: const Icon(Icons.arrow_forward),
-                ),
+                if (data.every((e) =>
+                    e.bigQuestionState == BigQuestionState.waitingForAdmin))
+                  FloatingActionButton.extended(
+                    onPressed: () async {
+                      final res = await Supabase.instance.client
+                          .rpc('start_all')
+                          .execute();
+                      if (res.error != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(res.error!.message),
+                          ),
+                        );
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("全てのライドを開始しました"),
+                        ),
+                      );
+                    },
+                    label: const Text("全体開始承認"),
+                    icon: const Icon(Icons.check),
+                  ),
               ],
             ),
             loading: () => const Center(child: CircularProgressIndicator()),

@@ -18,17 +18,34 @@ final userFutureProvoder = FutureProvider.family.autoDispose<UserModel, int>(
   },
 );
 
-final usersFutureProvider =
-    FutureProvider.autoDispose<List<UserModel>>((ref) async {
+final usersFutureProvider = FutureProvider.autoDispose<List<UserModel>>(
+  (ref) async {
+    final res = await Supabase.instance.client
+        .from('users')
+        .select()
+        .order('id')
+        .execute();
+    if (res.error != null) {
+      throw res.error!;
+    }
+    return (res.data! as List)
+        .map((dynamic e) => UserModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  },
+);
+
+final topUsersFutureProvider = FutureProvider<List<UserModel>>((ref) async {
   final res = await Supabase.instance.client
       .from('users')
       .select()
-      .order('id')
+      .order('total_point')
+      .limit(30)
       .execute();
   if (res.error != null) {
     throw res.error!;
   }
   return (res.data! as List)
       .map((dynamic e) => UserModel.fromJson(e as Map<String, dynamic>))
+      .where((e) => e.totalPoint != null)
       .toList();
 });

@@ -30,6 +30,9 @@ class UserRegisterPage extends HookConsumerWidget {
                 value: rideId.value,
                 decoration: const InputDecoration(
                   labelText: 'ライドID',
+                  border: OutlineInputBorder(
+                    
+                  ),
                 ),
                 items: List<int>.generate(6, (index) => index + 1)
                     .map<DropdownMenuItem<int>>(
@@ -42,20 +45,22 @@ class UserRegisterPage extends HookConsumerWidget {
                 onChanged: (value) => rideId.value = value,
               ),
               const SizedBox(height: 16),
-              ToggleSwitch(
-                initialLabelIndex: 0,
-                totalSwitches: 2,
-                radiusStyle: true,
-                customTextStyles: const [
-                  TextStyle(fontSize: 20),
-                  TextStyle(fontSize: 20)
-                ],
-                iconSize: 30,
-                labels: const ["1人", "2人"],
-                icons: const [Icons.person, Icons.people],
-                onToggle: (index) => numberOfPeople.value = index! + 1,
-                minWidth: 200,
-                minHeight: 60,
+              FittedBox(
+                child: ToggleSwitch(
+                  initialLabelIndex: 0,
+                  totalSwitches: 2,
+                  radiusStyle: true,
+                  customTextStyles: const [
+                    TextStyle(fontSize: 20),
+                    TextStyle(fontSize: 20)
+                  ],
+                  iconSize: 30,
+                  labels: const ["1人", "2人"],
+                  icons: const [Icons.person, Icons.people],
+                  onToggle: (index) => numberOfPeople.value = index! + 1,
+                  minWidth: 200,
+                  minHeight: 60,
+                ),
               ),
               const Divider(),
               const Text(

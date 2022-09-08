@@ -1,11 +1,13 @@
-import 'page/main.dart';
-import 'page/user_register.dart';
-import 'private/key.dart';
+import 'package:admin/page/result.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'page/main.dart';
+import 'page/user_register.dart';
+import 'private/key.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
+        fontFamily: 'NotoSansJP',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const MyHomePage(),
@@ -53,16 +56,16 @@ class MyHomePage extends HookConsumerWidget {
             labelType: NavigationRailLabelType.all,
             destinations: const [
               NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text("MAIN"),
+                icon: Icon(Icons.admin_panel_settings),
+                label: Text("Admin"),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.people),
-                label: Text("REGISTER"),
+                label: Text("Register"),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.expand),
-                label: Text("EXTENDED"),
+                icon: Icon(Icons.settings),
+                label: Text("Result"),
               ),
             ],
             onDestinationSelected: (index) => selectedIndex.value = index,
@@ -74,7 +77,7 @@ class MyHomePage extends HookConsumerWidget {
               children: const [
                 MainPage(),
                 UserRegisterPage(),
-                Text("EXTENDED"),
+                ResultPage(),
               ],
             ),
           ),
