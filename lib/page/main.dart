@@ -2,12 +2,10 @@
 
 import 'dart:convert';
 
-import 'package:admin/extension/position_color.dart';
-import 'package:admin/provider/state_item.dart';
-import 'package:admin/schema/state/state.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:classroom33common/classroom33common.dart';
 
 class MainPage extends HookConsumerWidget {
   const MainPage({Key? key}) : super(key: key);

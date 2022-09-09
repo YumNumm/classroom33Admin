@@ -1,12 +1,11 @@
-import 'package:admin/schema/user/user_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import '../provider/big_question_storage.dart';
-import '../schema/question/question_category.dart';
+import 'package:classroom33common/classroom33common.dart';
 
 class UserRegisterPage extends HookConsumerWidget {
   const UserRegisterPage({Key? key}) : super(key: key);
@@ -31,7 +30,7 @@ class UserRegisterPage extends HookConsumerWidget {
                 decoration: const InputDecoration(
                   labelText: 'ライドID',
                   border: OutlineInputBorder(
-                    
+
                   ),
                 ),
                 items: List<int>.generate(6, (index) => index + 1)

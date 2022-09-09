@@ -20,6 +20,9 @@ dependencies:
   supabase_flutter: ^0.3.3
   toggle_switch: ^2.0.1
   window_manager: ^0.2.5
+  classroom33common:
+    git:
+      url: git@github.com:YumNumm/classroom33Common.git
 
 dev_dependencies:
   build_runner: ^2.2.0
