@@ -52,7 +52,11 @@ class MyHomePage extends HookConsumerWidget {
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.refresh),
-            onPressed: () async => ref.refresh(usersFutureProvider),
+            onPressed: () {
+              ref
+                ..refresh(usersFutureProvider)
+                ..refresh(topUsersFutureProvider);
+            },
             label: const Text('Refresh Users'),
           )
         ],

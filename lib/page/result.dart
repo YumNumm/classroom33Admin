@@ -2,7 +2,6 @@ import 'package:classroom33common/classroom33common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class ResultPage extends HookConsumerWidget {
   const ResultPage({super.key});
@@ -14,6 +13,7 @@ class ResultPage extends HookConsumerWidget {
         // 全体の順位表
         Expanded(
           child: SingleChildScrollView(
+            controller: ScrollController(),
             child: ref.watch(topUsersFutureProvider).when<Widget>(
                   error: (error, stackTrace) => Text(
                     error.toString(),
@@ -37,19 +37,23 @@ class ResultPage extends HookConsumerWidget {
                               '${e.totalPoint}点',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 40,
                               ),
                             ),
-                            subtitle: Text(
-                              DateFormat('yyyy/MM/dd hh:mm頃')
-                                  .format(e.createdAt.toLocal()),
-                            ),
+                            // subtitle: Text(
+                            //   DateFormat('yyyy/MM/dd hh:mm頃')
+                            //       .format(e.createdAt.toLocal()),
+                            //   style: const TextStyle(
+                            //     fontSize: 20,
+                            //   ),
+                            // ),
                             leading: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   '第${index + 1}位',
                                   style: const TextStyle(
-                                    fontSize: 25,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -91,546 +95,57 @@ class ResultPage extends HookConsumerWidget {
                       ),
                     ),
                     data: (data) {
-                      return InkWell(
-                        onTap: () async => await showDialog<void>(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('ユーザを選択'),
-                              content: SizedBox(
-                                height: 300,
-                                width: 300,
-                                child: ListView.builder(
-                                  itemCount: data.length,
-                                  itemBuilder: (context, index) {
-                                    final e = data[index];
-                                    return ListTile(
-                                      title: Text(e.id.toString()),
-                                      onTap: () {
-                                        selectedUser.value = e;
-                                        Navigator.of(context).pop();
-                                      },
-                                    );
-                                  },
+                      try {
+                        return InkWell(
+                          onTap: () async => showDialog<void>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('ユーザを選択'),
+                                content: SizedBox(
+                                  height: 300,
+                                  width: 300,
+                                  child: ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      final e = data[index];
+                                      return ListTile(
+                                        title: Text(e.id.toString()),
+                                        onTap: () {
+                                          selectedUser.value = e;
+                                          Navigator.of(context).pop();
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        child: Column(
-                          children: [
-                            if (selectedUser.value != null)
-                              Column(
-                                children: [
-                                  // 大問1
-                                  Card(
-                                    elevation: 2,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: DevicePosition
-                                              .projector1.onPrimary
-                                              .map((e) => e.withOpacity(0.7))
-                                              .toList(),
-                                        ),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Card(
-                                              color: Colors.white
-                                                  .withOpacity(0.85),
-                                              child: const Padding(
-                                                padding: EdgeInsets.all(8),
-                                                child: Text(
-                                                  ' 1 ',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Card(
-                                                color: Colors.white
-                                                    .withOpacity(0.85),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          children: [
-                                                            const Text(
-                                                              '大問小計',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '${List<int>.generate(3, (index) => index).map(
-                                                                (e) {
-                                                                  return selectedUser
-                                                                      .value!
-                                                                      .result
-                                                                      .items[e]
-                                                                      .toPoint;
-                                                                },
-                                                              ).reduce((value, element) => value + element)}点',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                  '小問1',
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[0].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                  '小問2',
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[1].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                  '小問3',
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[2].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                              );
+                            },
+                          ),
+                          child: (selectedUser.value == null)
+                              ? const FittedBox(
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 100,
                                   ),
-
-                                  // 大問2
-                                  Card(
-                                    elevation: 2,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: DevicePosition
-                                              .projector2.onPrimary
-                                              .map((e) => e.withOpacity(0.7))
-                                              .toList(),
-                                        ),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Card(
-                                              color: Colors.white
-                                                  .withOpacity(0.85),
-                                              child: const Padding(
-                                                padding: EdgeInsets.all(8),
-                                                child: Text(
-                                                  ' 2 ',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Card(
-                                                color: Colors.white
-                                                    .withOpacity(0.85),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          children: [
-                                                            const Text(
-                                                              '大問小計',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '${List<int>.generate(3, (index) => index + 3).map(
-                                                                (e) {
-                                                                  return selectedUser
-                                                                      .value!
-                                                                      .result
-                                                                      .items[e]
-                                                                      .toPoint;
-                                                                },
-                                                              ).reduce((value, element) => value + element)}点',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問1'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[3].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問2'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[4].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問3'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[5].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // 大問3
-                                  Card(
-                                    elevation: 2,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: DevicePosition
-                                              .projector3.onPrimary
-                                              .map((e) => e.withOpacity(0.7))
-                                              .toList(),
-                                        ),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Card(
-                                              color: Colors.white
-                                                  .withOpacity(0.85),
-                                              child: const Padding(
-                                                padding: EdgeInsets.all(8),
-                                                child: Text(
-                                                  ' 3 ',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Card(
-                                                color: Colors.white
-                                                    .withOpacity(0.85),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          children: [
-                                                            const Text(
-                                                              '大問小計',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '${List<int>.generate(3, (index) => index + 6).map(
-                                                                (e) {
-                                                                  return selectedUser
-                                                                      .value!
-                                                                      .result
-                                                                      .items[e]
-                                                                      .toPoint;
-                                                                },
-                                                              ).reduce((value, element) => value + element)}点',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問1'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[6].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問2'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[7].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              children: [
-                                                                const Text(
-                                                                    '小問3'),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  '${selectedUser.value?.result.items[8].toPoint}点',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // 総合得点
-                                  const Divider(),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Card(
-                                      elevation: 5,
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // 大問1
+                                    Card(
+                                      elevation: 2,
                                       child: DecoratedBox(
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(16),
-                                          gradient: const LinearGradient(
+                                          gradient: LinearGradient(
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
-                                            colors: [
-                                              Color.fromARGB(255, 0, 140, 255),
-                                              Color.fromARGB(255, 255, 0, 85),
-                                            ],
+                                            colors: DevicePosition
+                                                .projector1.onPrimary
+                                                .map((e) => e.withOpacity(0.7))
+                                                .toList(),
                                           ),
                                         ),
                                         child: Padding(
@@ -639,6 +154,21 @@ class ResultPage extends HookConsumerWidget {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
+                                              Card(
+                                                color: Colors.white
+                                                    .withOpacity(0.85),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(8),
+                                                  child: Text(
+                                                    ' 1 ',
+                                                    style: TextStyle(
+                                                      fontSize: 40,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                               Expanded(
                                                 child: Card(
                                                   color: Colors.white
@@ -649,53 +179,179 @@ class ResultPage extends HookConsumerWidget {
                                                     child: Row(
                                                       children: [
                                                         Expanded(
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceAround,
+                                                          child: Column(
                                                             children: [
-                                                              const Expanded(
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    '総合得点',
+                                                              const Text(
+                                                                '大問小計',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '${List<int>.generate(3, (index) => index).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .toPoint;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}点',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 50,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '(正${List<int>.generate(3, (index) => index).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .correctCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}, 誤${List<int>.generate(3, (index) => index).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .wrongCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)})',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問1',
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
-                                                                          20,
-                                                                      textBaseline:
-                                                                          TextBaseline
-                                                                              .ideographic,
+                                                                          30,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    '${List<int>.generate(9, (index) => index).map(
-                                                                      (e) {
-                                                                        return selectedUser
-                                                                            .value!
-                                                                            .result
-                                                                            .items[e]
-                                                                            .toPoint;
-                                                                      },
-                                                                    ).reduce((value, element) => value + element)}点',
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[0].toPoint}点',
                                                                     style:
                                                                         const TextStyle(
                                                                       fontSize:
-                                                                          60,
+                                                                          40,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
-                                                                      textBaseline:
-                                                                          TextBaseline
-                                                                              .ideographic,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              )
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[0].correctCount}, 誤${selectedUser.value?.result.items[0].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問2',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[1].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[1].correctCount}, 誤${selectedUser.value?.result.items[1].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問3',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[2].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[2].correctCount}, 誤${selectedUser.value?.result.items[2].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -709,12 +365,615 @@ class ResultPage extends HookConsumerWidget {
                                         ),
                                       ),
                                     ),
+
+                                    // 大問2
+                                    Card(
+                                      elevation: 2,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: DevicePosition
+                                                .projector2.onPrimary
+                                                .map((e) => e.withOpacity(0.7))
+                                                .toList(),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Card(
+                                                color: Colors.white
+                                                    .withOpacity(0.85),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(8),
+                                                  child: Text(
+                                                    ' 2 ',
+                                                    style: TextStyle(
+                                                      fontSize: 40,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Card(
+                                                  color: Colors.white
+                                                      .withOpacity(0.85),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Column(
+                                                            children: [
+                                                              const Text(
+                                                                '大問小計',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '${List<int>.generate(3, (index) => index + 3).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .toPoint;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}点',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 50,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '(正${List<int>.generate(3, (index) => index + 3).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .correctCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}, 誤${List<int>.generate(3, (index) => index + 3).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .wrongCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)})',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問1',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[3].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[3].correctCount}, 誤${selectedUser.value?.result.items[3].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問2',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[4].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[4].correctCount}, 誤${selectedUser.value?.result.items[4].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問3',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[5].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[5].correctCount}, 誤${selectedUser.value?.result.items[5].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // 大問3
+                                    Card(
+                                      elevation: 2,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: DevicePosition
+                                                .projector3.onPrimary
+                                                .map((e) => e.withOpacity(0.7))
+                                                .toList(),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Card(
+                                                color: Colors.white
+                                                    .withOpacity(0.85),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(8),
+                                                  child: Text(
+                                                    ' 3 ',
+                                                    style: TextStyle(
+                                                      fontSize: 40,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Card(
+                                                  color: Colors.white
+                                                      .withOpacity(0.85),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Column(
+                                                            children: [
+                                                              const Text(
+                                                                '大問小計',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '${List<int>.generate(3, (index) => index + 6).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .toPoint;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}点',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 50,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '(正${List<int>.generate(3, (index) => index + 6).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .correctCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)}, 誤${List<int>.generate(3, (index) => index + 6).map(
+                                                                  (e) {
+                                                                    return selectedUser
+                                                                        .value!
+                                                                        .result
+                                                                        .items[
+                                                                            e]
+                                                                        .wrongCount;
+                                                                  },
+                                                                ).reduce((value, element) => value + element)})',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問1',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[6].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[6].correctCount}, 誤${selectedUser.value?.result.items[6].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問2',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[7].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[7].correctCount}, 誤${selectedUser.value?.result.items[7].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  const Text(
+                                                                    '小問3',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectedUser.value?.result.items[8].toPoint}点',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '(正${selectedUser.value?.result.items[8].correctCount}, 誤${selectedUser.value?.result.items[8].wrongCount})',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // 総合得点
+                                    const Divider(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Card(
+                                        elevation: 5,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            gradient: const LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Color.fromARGB(
+                                                  255,
+                                                  0,
+                                                  140,
+                                                  255,
+                                                ),
+                                                Color.fromARGB(255, 255, 0, 85),
+                                              ],
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Card(
+                                                    color: Colors.white
+                                                        .withOpacity(0.85),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                        8,
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceAround,
+                                                              children: [
+                                                                const Expanded(
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      '総合得点',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            40,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        textBaseline:
+                                                                            TextBaseline.ideographic,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      '${List<int>.generate(9, (index) => index).map(
+                                                                        (e) {
+                                                                          return selectedUser
+                                                                              .value!
+                                                                              .result
+                                                                              .items[e]
+                                                                              .toPoint;
+                                                                        },
+                                                                      ).reduce((value, element) => value + element)}点',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            60,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        textBaseline:
+                                                                            TextBaseline.ideographic,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        );
+                      } catch (e) {
+                        return InkWell(
+                          onTap: () async => showDialog<void>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('ユーザを選択'),
+                                content: SizedBox(
+                                  height: 300,
+                                  width: 300,
+                                  child: ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      final e = data[index];
+                                      return ListTile(
+                                        title: Text(e.id.toString()),
+                                        onTap: () {
+                                          selectedUser.value = e;
+                                          Navigator.of(context).pop();
+                                        },
+                                      );
+                                    },
                                   ),
-                                ],
-                              )
-                          ],
-                        ),
-                      );
+                                ),
+                              );
+                            },
+                          ),
+                          child: Text(
+                            'エラーが発生しました\n$e',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      }
                     },
                   ),
             ],

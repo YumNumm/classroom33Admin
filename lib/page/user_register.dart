@@ -1,14 +1,12 @@
-
+import 'package:classroom33common/classroom33common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import 'package:classroom33common/classroom33common.dart';
-
 class UserRegisterPage extends HookConsumerWidget {
-  const UserRegisterPage({Key? key}) : super(key: key);
+  const UserRegisterPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final rideId = useState<int?>(null);
@@ -19,8 +17,9 @@ class UserRegisterPage extends HookConsumerWidget {
 
     return Scaffold(
       body: SingleChildScrollView(
+        controller: ScrollController(),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -29,9 +28,7 @@ class UserRegisterPage extends HookConsumerWidget {
                 value: rideId.value,
                 decoration: const InputDecoration(
                   labelText: 'ライドID',
-                  border: OutlineInputBorder(
-
-                  ),
+                  border: OutlineInputBorder(),
                 ),
                 items: List<int>.generate(6, (index) => index + 1)
                     .map<DropdownMenuItem<int>>(
@@ -46,7 +43,6 @@ class UserRegisterPage extends HookConsumerWidget {
               const SizedBox(height: 16),
               FittedBox(
                 child: ToggleSwitch(
-                  initialLabelIndex: 0,
                   totalSwitches: 2,
                   radiusStyle: true,
                   customTextStyles: const [
@@ -54,7 +50,7 @@ class UserRegisterPage extends HookConsumerWidget {
                     TextStyle(fontSize: 20)
                   ],
                   iconSize: 30,
-                  labels: const ["1人", "2人"],
+                  labels: const ['1人', '2人'],
                   icons: const [Icons.person, Icons.people],
                   onToggle: (index) => numberOfPeople.value = index! + 1,
                   minWidth: 200,
@@ -63,7 +59,7 @@ class UserRegisterPage extends HookConsumerWidget {
               ),
               const Divider(),
               const Text(
-                "カテゴリ選択",
+                'カテゴリ選択',
                 style: TextStyle(fontSize: 20),
               ),
               Wrap(
@@ -111,7 +107,7 @@ class UserRegisterPage extends HookConsumerWidget {
               const Divider(),
               if (selectedCard.value != null)
                 const Text(
-                  "大問セットの選択",
+                  '大問セットの選択',
                   style: TextStyle(fontSize: 20),
                 ),
               if (selectedCard.value != null)
@@ -119,7 +115,7 @@ class UserRegisterPage extends HookConsumerWidget {
                     .watch(questionProvider)
                     .where((e) => e.category == selectedCard.value))
                   RadioListTile<int>(
-                    title: Text(question.title.toString()),
+                    title: Text(question.title),
                     value: question.id,
                     groupValue: selectedQuizCase.value,
                     onChanged: (value) => selectedQuizCase.value = question.id,
@@ -141,25 +137,22 @@ class UserRegisterPage extends HookConsumerWidget {
                     'ride_id': rideId.value,
                   }).execute();
 
-                  if (res.error != null) {
-                    throw res.error!;
-                  }
-
                   final user = UserModel.fromJson(
-                      (res.data as List)[0] as Map<String, dynamic>);
+                    (res.data as List)[0] as Map<String, dynamic>,
+                  );
 
                   selectedCard.value = null;
                   selectedQuizCase.value = null;
                   rideId.value = null;
                   // ignore: use_build_context_synchronously
                   // show AlertDialog
-                  showDialog<void>(
+                  await showDialog<void>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text("登録完了"),
+                      title: const Text('登録完了'),
                       content: Text(
-                        "ID:${user.id}\n"
-                        "ライドID: ${user.rideId}",
+                        'ID:${user.id}\n'
+                        'ライドID: ${user.rideId}',
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -167,7 +160,7 @@ class UserRegisterPage extends HookConsumerWidget {
                       ),
                       actions: [
                         FloatingActionButton.extended(
-                          label: const Text("OK"),
+                          label: const Text('OK'),
                           icon: const Icon(Icons.check),
                           onPressed: () {
                             Navigator.of(context).pop<void>();
@@ -178,16 +171,16 @@ class UserRegisterPage extends HookConsumerWidget {
                   );
                   textController.clear();
                 } on Exception catch (e) {
-                  print("ERROR");
-                  showDialog<void>(
+                  print('ERROR');
+                  await showDialog<void>(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: const Text("エラー"),
+                        title: const Text('エラー'),
                         content: Text((e).toString()),
                         actions: [
                           FloatingActionButton.extended(
-                            label: const Text("OK"),
+                            label: const Text('OK'),
                             icon: const Icon(Icons.check),
                             onPressed: () {
                               Navigator.of(context).pop<void>();
@@ -199,7 +192,7 @@ class UserRegisterPage extends HookConsumerWidget {
                   );
                 }
               },
-              label: const Text("登録"),
+              label: const Text('登録'),
               icon: const Icon(Icons.add),
             )
           : null,
