@@ -135,6 +135,7 @@ class UserRegisterPage extends HookConsumerWidget {
                       .insert(<String, dynamic>{
                     'big_question_group_id': selectedQuizCase.value,
                     'ride_id': rideId.value,
+                    'number_of_people': numberOfPeople.value,
                   }).execute();
 
                   final user = UserModel.fromJson(
@@ -152,7 +153,8 @@ class UserRegisterPage extends HookConsumerWidget {
                       title: const Text('登録完了'),
                       content: Text(
                         'ID:${user.id}\n'
-                        'ライドID: ${user.rideId}',
+                        'ライドID: ${user.rideId}\n'
+                        '大問ID: ${selectedQuizCase.value}',
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
