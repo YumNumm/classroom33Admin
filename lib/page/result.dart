@@ -1,3 +1,4 @@
+import 'package:admin/provider/average_provider.dart';
 import 'package:classroom33common/classroom33common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -25,54 +26,110 @@ class ResultPage extends HookConsumerWidget {
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   data: (data) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        final e = data[index];
-                        return Card(
+                    return Column(
+                      children: [
+                        Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 8,
                           child: ListTile(
-                            title: Text(
-                              '${e.totalPoint}点',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 40,
-                              ),
-                            ),
-                            // subtitle: Text(
-                            //   DateFormat('yyyy/MM/dd hh:mm頃')
-                            //       .format(e.createdAt.toLocal()),
-                            //   style: const TextStyle(
-                            //     fontSize: 20,
-                            //   ),
-                            // ),
+                            title: ref
+                                .watch(averagePointFutureProvider)
+                                .when<Widget>(
+                                  loading: CircularProgressIndicator.adaptive,
+                                  error: (error, stackTrace) => Text(
+                                    error.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  data: (data) => Text(
+                                    '${data.toStringAsFixed(1)}点',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 40,
+                                    ),
+                                  ),
+                                ),
                             leading: Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: [
+                              children: const [
                                 Text(
-                                  '第${index + 1}位',
-                                  style: const TextStyle(
+                                  '平均点',
+                                  style: TextStyle(
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Image.asset(
-                                  ref
-                                      .watch(questionProvider)
-                                      .firstWhere(
-                                        (element) =>
-                                            element.id == e.bigQuestionGroupId,
-                                      )
-                                      .category
-                                      .imagePath,
-                                ),
-                                const VerticalDivider(),
+                                VerticalDivider(),
                               ],
                             ),
                           ),
-                        );
-                      },
+                        ),
+                        const Divider(),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            final e = data[index];
+                            return Card(
+                              elevation: (e.id == selectedUser.value?.id)
+                                  ? 10
+                                  : null, //a 選択されているユーザーのカードを強調
+                              // テーマから色を取得
+                              color: (e.id == selectedUser.value?.id)
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer
+                                  : null,
+                              child: ListTile(
+                                title: Text(
+                                  '${e.totalPoint}点',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 40,
+                                  ),
+                                ),
+
+                                // subtitle: Text(
+                                //   DateFormat('yyyy/MM/dd hh:mm頃')
+                                //       .format(e.createdAt.toLocal()),
+                                //   style: const TextStyle(
+                                //     fontSize: 20,
+                                //   ),
+                                // ),
+                                leading: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '第${index + 1}位',
+                                      style: const TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Image.asset(
+                                      ref
+                                          .watch(questionProvider)
+                                          .firstWhere(
+                                            (element) =>
+                                                element.id ==
+                                                e.bigQuestionGroupId,
+                                          )
+                                          .category
+                                          .imagePath,
+                                    ),
+                                    const VerticalDivider(),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     );
                   },
                 ),
